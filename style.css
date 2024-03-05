@@ -31,8 +31,8 @@ section{
 header {
   position: fixed;
   top: 0; left: 0;right: 0;
-  background-color: #fff;
-  padding: 2rem 9%;
+  /* background-color: #1B1A55; */
+  padding: 1rem 1%;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -42,22 +42,25 @@ header {
 
 .logo{
   font-size: 3rem;
-  color: #00555f;
+  color: white;
   font-weight: bolder;
+  text-align: left;
 }
-
+.logopic{
+  border-radius: 50%;
+}
 .logo span{
-  color: #00383f;
+  color: white;
 }
 
 .navbar a{
   font-size: 2rem;
   padding: 2 3 5.5rem;
-  color: #95cfd5;
+  color: white;
 }
 
 .navbar a:hover{
-  color:#00383f;
+  color:white;
 }
 
 #toggler{
@@ -78,7 +81,8 @@ header {
   display: flex;
   align-items: center;
   min-height: 100vh;
-  background:  url('img2.jpg') no-repeat;
+  background:  linear-gradient(90deg,rgb(27, 26, 85),rgb(27, 26, 85)),
+  white; /* here is your single color */
   background-size: cover;
   background-position: center;
   filter: brightness(75%);
@@ -90,7 +94,7 @@ header {
 
 .content h3{
   font-size: 6rem;
-  color: #00555f;
+  color: white;
 }
 
 .content span{
@@ -252,6 +256,7 @@ header {
   margin-right: 2rem;
   object-fit: contain;
 }
+
 
 
 @media(max-width:991px){
