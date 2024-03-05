@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Upload PDF Documents</title>
+    <style>
+        /* Body */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+            background-size: 400% 400%;
+            animation: gradient 15s ease infinite;
+        }
+        @keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        /* Outer Container */
+        .outer-container {
+            width: 400px; /* Adjust width */
+            background-color: #ffffff; /* White background */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Shadow */
+            padding: 20px;
+            border-radius: 10px;
+            display: flex; /* Add flexbox */
+            flex-direction: column; /* Arrange items vertically */
+            align-items: center; /* Center items horizontally */
+        }
+
+        /* Drag and Drop Container */
+        .upload-area {
+            border: 2px dashed #3498db;
+            border-radius: 10px;
+            padding: 30px;
+            cursor: pointer;
+            transition: border-color 0.3s ease;
+            margin-top: 20px;
+            display: flex; /* Add flexbox */
+            flex-direction: column; /* Arrange items vertically */
+            align-items: center; /* Center items horizontally */
+        }
+
+        .upload-icon {
+            font-size: 60px;
+            color: #3498db;
+            margin-bottom: 10px;
+        }
+
+        .upload-text {
+            font-family: Arial, sans-serif; /* Choose a suitable font */
+            font-size: 16px; /* Adjust the font size for better readability */
+            color: #555;
+            text-align: center;
+            margin: 0; /* Remove default margin */
+        }
+
+        .upload-area:hover {
+            border-color: #2980b9;
+        }
+
+        /* Additional Text */
+        .additional-text {
+            font-size: 16px;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        /* Additional H1 */
+        h1 {
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            color: #333;
+            text-align: center;
+            margin-top: 20px;
+        }
+        .upload-guidelines{
+            background: rgba(255, 255, 255, 0.05);
+            border:solid 1px rgba(255, 255, 255, 0.25);
+            padding: 1.75em 2.5em 1.75em 2.5em;
+            display: inline-block;
+            position: relative;
+            z-index: 1;
+            color: #fff;
+            border-radius: 2em;
+            
+        }
+        h4 {
+    display: block;
+    margin-block-start: 1.33em;
+    margin-block-end: 1.33em;
+    margin-inline-start: 0px;
+    margin-inline-end: 0px;
+    font-weight: bold;
+}
+.guidelines{
+    display: flexbox;
+    align-items: center;
+}
+        
+    </style>
+</head>
+<body>
+    <!--THIS IS FOR UPLOAD BOX-->
+    <div class="outer-container">
+        <h2>What do you want to start with?</h2>
+        <div class="guidelines" >
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">&#x1F4C1;</div>
+            <div class="upload-text">Drag and drop PDF files here<br>or click to browse</div>
+            <input type="file" id="fileInput" accept=".pdf" multiple style="display: none;">
+        </div>
+        <p class="additional-text">Ready to elevate your career? Upload your resume now and let our expert team provide you with invaluable feedback.</p>
+    </div>
+    
+
+</div>
+
+
+ 
+
+    <!--THIS IS FOR GUIDELINES-->
+
+    <!-- &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;    <div class="upload-guidelines" style="width:90%;">
+        <h1></h1>
+        <h4><i class="fa fa-arrow-right" aria-hidden="true"></i> is in PDF or DOCX</h4>
+        <h4><i class="fa fa-arrow-right" aria-hidden="true"></i> is in English</h4>
+        <h4><i class="fa fa-arrow-right" aria-hidden="true"></i> contains readable text &amp; is not an image</h4>
+        <h4><i class="fa fa-arrow-right" aria-hidden="true"></i> is a maximum of 2 MB in filesize</h4>
+        <h4><i class="fa fa-arrow-right" aria-hidden="true"></i> is a resume and not any other file</h4>
+        <h4><i class="fa fa-arrow-right" aria-hidden="true"></i> is not password protected</h4>
+        <h4><i class="fa fa-arrow-right" aria-hidden="true"></i> contains only your resume and no other additional documents</h4>
+        <br>
+        <br>
+        <h4>Need help? See our <a href="#" target="_blank" style="border-bottom: 3px solid white;">help article</a>.</h4>
+        <h4>Tip: If you upload a Word document, it may look a little different on our app due to different fonts and system configurations. But don't worry, it will be processed completely fine on our servers and the resume review will be accurate.</h4>
+</div> -->
+
+    <script>
+        // JavaScript code here
+        
+        document.getElementById('uploadArea').addEventListener('click', () => {
+            document.getElementById('fileInput').click();
+        });
+
+        document.getElementById('fileInput').addEventListener('change', handleFileSelect, false);
+
+        function handleFileSelect(event) {
+            const fileList = document.createElement('ul');
+            const files = event.target.files;
+            if (files.length === 0) {
+                fileList.innerHTML = 'No files selected';
+            } else {
+                for (let i = 0; i < files.length; i++) {
+                    const listItem = document.createElement('li');
+                    listItem.textContent = files[i].name;
+                    fileList.appendChild(listItem);
+                }
+            }
+            document.body.appendChild(fileList);
+        }
+
+        const uploadArea = document.getElementById('uploadArea');
+
+        uploadArea.addEventListener('dragover', (event) => {
+            event.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (event) => {
+            event.preventDefault();
+            uploadArea.classList.remove('dragover');
+            handleFileSelect(event);
+        });
+    </script>
+
+
+
+</body>
+</html>
