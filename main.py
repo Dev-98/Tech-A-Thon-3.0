@@ -1,13 +1,15 @@
 import streamlit as st
 import spacy
-import pinecone
+import base64, re
+from pyresparser import ResumeParser
+from streamlit_tags import st_tags
+from pdfminer.high_level import extract_text
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 
 # Load English tokenizer, tagger, parser, NER, and word vectors
 nlp = spacy.load("en_core_web_sm")
 
-# Initialize Pinecone client
-pinecone.init(api_key="your_pinecone_api_key")
-index = pinecone.Index("your_index_name")
 
 # Function to extract summary and skills from resume
 def extract_summary_and_skills(text):
@@ -29,11 +31,36 @@ def text_to_embedding(text):
     embedding = [0.1] * 100  # Placeholder embedding
     return embedding
 
-# Function to search Pinecone DB using embeddings
-def search_pinecone(embedding):
-    # Search Pinecone DB using the embedding
-    results = index.query(queries=[embedding], top_k=10)
-    return results
+def pdf_reader(pdf_file):
+    
+    text = extract_text(pdf_file).lower()
+    # skill = text.split("skills")[1:]
+   
+    token_text = word_tokenize(text)
+    stop_words = stopwords.words('english')
+    clean_text = []
+    for i in token_text:
+        if i not in stop_words:
+            clean_text.append(i)
+    clean_text = " ".join(clean_text)
+    
+    pattern = re.compile(r'[^a-zA-Z0-9\s]')
+    clean_text = re.sub(pattern, '', clean_text).replace("\n", "")
+    
+    # Define a regular expression pattern to match numbers
+    pattern2 = r'\d+'
+
+    # Remove numbers from the text using regex substitution
+    text_without_numbers = re.sub(pattern2, '', clean_text)
+    
+    return text_without_numbers
+
+def show_pdf(file_path):
+    with open(file_path, "rb") as f:
+        base64_pdf = base64.b64encode(f.read()).decode('utf-8')
+    # pdf_display = f'<embed src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf">'
+    pdf_display = F'<iframe src="data:application/pdf;base64,{base64_pdf}" width="700" height="1000" type="application/pdf"></iframe>'
+    st.markdown(pdf_display, unsafe_allow_html=True)
 
 # Streamlit app
 def main():
@@ -45,11 +72,50 @@ def main():
     
     if uploaded_file is not None:
         # Read PDF file
+        save_image_path = './Uploaded_Resumes/' + uploaded_file.name
+        with open(save_image_path, "wb") as f:
+            f.write(uploaded_file.getbuffer())
+
+        show_pdf(save_image_path)
         resume_text = ""  # Placeholder for resume text
         with st.spinner("Extracting text from PDF..."):
-            # Use PyPDF2 or similar library to extract text from PDF
-            # Replace this with your actual code for extracting text from PDF
-            resume_text = "Text extracted from PDF resume"
+        
+            resume_data = ResumeParser(uploaded_file).get_extracted_data()
+            if resume_data:
+                ## Get the whole resume data
+                resume_text = pdf_reader(save_image_path)
+
+                st.header("**Resume Analysis**")
+                st.success("Hello " + resume_data['name'])
+                st.subheader("**Your Basic info**")
+                try:
+                    st.text('Name: ' + resume_data['name'])
+                    st.text('Email: ' + resume_data['email'])
+                    st.text('Contact: ' + resume_data['mobile_number'])
+                    st.text('Resume pages: ' + str(resume_data['no_of_pages']))
+                except:
+                    pass
+                cand_level = ''
+                if resume_data['no_of_pages'] == 1:
+                    cand_level = "Fresher"
+                    st.markdown('''<h4 style='text-align: left; color: #d73b5c;'>You are looking Fresher.</h4>''',
+                                unsafe_allow_html=True)
+                elif resume_data['no_of_pages'] == 2:
+                    cand_level = "Intermediate"
+                    st.markdown('''<h4 style='text-align: left; color: #1ed760;'>You are at intermediate level!</h4>''',
+                                unsafe_allow_html=True)
+                elif resume_data['no_of_pages'] >= 3:
+                    cand_level = "Experienced"
+                    st.markdown('''<h4 style='text-align: left; color: #fba171;'>You are at experience level!''',
+                                unsafe_allow_html=True)
+
+                st.subheader("**Skills Recommendation💡**")
+                ## Skill shows
+                keywords = st_tags(label='### Skills that you have',
+                                   text='See our skills recommendation',
+                                   value=resume_data['skills'], key='1')
+                
+                
         
         # Extract summary and skills
         with st.spinner("Extracting summary and skills..."):
@@ -62,20 +128,20 @@ def main():
         st.write(skills)
         
         # Convert summary and skills to embeddings
-        with st.spinner("Converting text to embeddings..."):
-            summary_embedding = text_to_embedding(summary)
-            skills_embedding = text_to_embedding(skills)
+        # with st.spinner("Converting text to embeddings..."):
+        #     summary_embedding = text_to_embedding(summary)
+        #     skills_embedding = text_to_embedding(skills)
         
-        # Search Pinecone DB using embeddings
-        with st.spinner("Searching Pinecone DB..."):
-            summary_results = search_pinecone(summary_embedding)
-            skills_results = search_pinecone(skills_embedding)
+        # # Search Pinecone DB using embeddings
+        # # with st.spinner("Searching Pinecone DB..."):
+        # #     summary_results = search_pinecone(summary_embedding)
+        # #     skills_results = search_pinecone(skills_embedding)
         
-        # Display search results
-        st.write("Summary Search Results:")
-        st.write(summary_results)
-        st.write("Skills Search Results:")
-        st.write(skills_results)
+        # # Display search results
+        # st.write("Summary Search Results:")
+        # st.write(summary_results)
+        # st.write("Skills Search Results:")
+        # st.write(skills_results)
 
 if __name__ == "__main__":
     main()
